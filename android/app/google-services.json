@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "555209677291",
+    "project_id": "evapp-c3fdd",
+    "storage_bucket": "evapp-c3fdd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555209677291:android:f73d4e9223d3eaa0ca21ae",
+        "android_client_info": {
+          "package_name": "com.evapp.evapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4DU1WKA0_cNU_BBaNvchA2PtDo_MDxpY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
