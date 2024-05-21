@@ -5,8 +5,13 @@ import 'package:evapp/constants/app_color_constants.dart';
 class SettingsPage extends StatefulWidget {
   final String eventId;
   final Map<String, dynamic> eventData;
+  final Function(String eventId, String userId) onRemoveParticipant;
 
-  const SettingsPage({super.key, required this.eventId, required this.eventData});
+  const SettingsPage(
+      {super.key,
+      required this.eventId,
+      required this.eventData,
+      required this.onRemoveParticipant});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -52,12 +57,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _fetchParticipants() async {
-    final eventDoc = FirebaseFirestore.instance.collection('events').doc(widget.eventId);
+    final eventDoc =
+        FirebaseFirestore.instance.collection('events').doc(widget.eventId);
     final docSnapshot = await eventDoc.get();
     if (docSnapshot.exists) {
-      final participantIds = List<String>.from(docSnapshot.data()?['participants'] ?? []);
+      final participantIds =
+          List<String>.from(docSnapshot.data()?['participants'] ?? []);
       for (var participantId in participantIds) {
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(participantId).get();
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(participantId)
+            .get();
         if (userDoc.exists) {
           setState(() {
             participants[participantId] = userDoc.data()?['name'] ?? 'Unknown';
@@ -76,7 +86,8 @@ class _SettingsPageState extends State<SettingsPage> {
       final date = _dateController.text.trim();
       final explain = _explainController.text.trim();
 
-      final eventDoc = FirebaseFirestore.instance.collection('events').doc(widget.eventId);
+      final eventDoc =
+          FirebaseFirestore.instance.collection('events').doc(widget.eventId);
       await eventDoc.update({
         'eventName': eventName,
         'city': city,
@@ -94,7 +105,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _deleteEvent() async {
-    final eventDoc = FirebaseFirestore.instance.collection('events').doc(widget.eventId);
+    final eventDoc =
+        FirebaseFirestore.instance.collection('events').doc(widget.eventId);
     await eventDoc.delete();
 
     showDialog(
@@ -118,7 +130,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _removeParticipant(String participantId) async {
-    final eventDoc = FirebaseFirestore.instance.collection('events').doc(widget.eventId);
+    final eventDoc =
+        FirebaseFirestore.instance.collection('events').doc(widget.eventId);
     await eventDoc.update({
       'participants': FieldValue.arrayRemove([participantId]),
     });
@@ -126,6 +139,8 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       participants.remove(participantId);
     });
+
+    widget.onRemoveParticipant(widget.eventId, participantId);
 
     showDialog(
       context: context,
@@ -252,8 +267,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 decoration: const InputDecoration(
                   labelText: 'Katılımcı Sayısı',
                 ),
-                items: List.generate(50, (index) => index + 1)
-                    .map((int value) {
+                items: List.generate(50, (index) => index + 1).map((int value) {
                   return DropdownMenuItem<int>(
                     value: value,
                     child: Text(value.toString()),
@@ -292,11 +306,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 itemCount: participants.length,
                 itemBuilder: (context, index) {
                   final participantId = participants.keys.elementAt(index);
-                  final participantName = participants[participantId] ?? 'Unknown';
+                  final participantName =
+                      participants[participantId] ?? 'Unknown';
                   return ListTile(
                     title: Text(participantName),
                     trailing: IconButton(
-                      icon: const Icon(Icons.close, color: AppColorConstants.red),
+                      icon:
+                          const Icon(Icons.close, color: AppColorConstants.red),
                       onPressed: () {
                         _removeParticipant(participantId);
                       },

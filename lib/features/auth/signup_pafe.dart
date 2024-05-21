@@ -77,6 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUp() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
     });
@@ -100,15 +101,19 @@ class _SignUpPageState extends State<SignUpPage> {
             profilePhotoUrl ?? '', // Ensure this field is always set
       });
 
-      _showSuccessDialog();
+      if (mounted) {
+        _showSuccessDialog();
+      }
     } on FirebaseAuthException catch (e) {
       print('Error: ${e.message}');
     } catch (e) {
       print('Error: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
