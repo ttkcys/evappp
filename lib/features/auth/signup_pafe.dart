@@ -45,15 +45,25 @@ class _SignUpPageState extends State<SignUpPage> {
       Reference firebaseStorageRef = FirebaseStorage.instance
           .ref()
           .child('profilePhotos/$userId/$fileName');
-      UploadTask uploadTask = firebaseStorageRef.putFile(_profileImage!);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-      return downloadUrl;
+      
+      // Check if the directory already exists
+      ListResult result = await firebaseStorageRef.parent!.listAll();
+      if (result.items.isEmpty) {
+        // Directory does not exist, proceed with upload
+        UploadTask uploadTask = firebaseStorageRef.putFile(_profileImage!);
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        return downloadUrl;
+      } else {
+        // Directory exists, return null or handle accordingly
+        return null;
+      }
     }
     return null;
   }
 
   void _showSuccessDialog() {
+    if (!mounted) return; // Ensure the widget is still mounted
     showDialog(
       context: context,
       builder: (BuildContext context) {
